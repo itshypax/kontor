@@ -42,7 +42,7 @@ export function forcesVatReturn(kind: CategoryKind, code: TaxCode): boolean {
 export function lineEffect(kind: CategoryKind, code: TaxCode, mode: Mode, amounts: { net: number; tax: number; gross: number }, fmt: (cents: number) => string): { title: string; text: string; warn: boolean } {
   const info = TAX_CODES[code]
   const { net, tax, gross } = amounts
-  if (kind === 'private') return { title: 'Privat, nicht in der EÜR', text: 'Einlagen und Entnahmen ändern den Gewinn nicht.', warn: false }
+  if (kind === 'private_in' || kind === 'private_out') return { title: 'Privat, nicht in der EÜR', text: 'Einlagen und Entnahmen ändern den Gewinn nicht.', warn: false }
   if (kind === 'tax_payment') return { title: 'In der EÜR: Ausgabe ' + fmt(gross), text: 'Zahlungen an das Finanzamt stehen in einer eigenen Zeile der Anlage EÜR.', warn: false }
   if (kind === 'tax_refund') return { title: 'In der EÜR: Einnahme ' + fmt(gross), text: 'Erstattungen des Finanzamts stehen in einer eigenen Zeile der Anlage EÜR.', warn: false }
   if (kind === 'asset') return { title: 'Anlagegut, nicht direkt in der EÜR', text: 'Die Ausgabe wirkt über die Abschreibung im Anlagenverzeichnis.', warn: false }

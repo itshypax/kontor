@@ -44,7 +44,8 @@ export function positionLabel(key: string): string {
 export function contributions(line: Pick<LineFact, 'kind' | 'position' | 'taxCode' | 'net' | 'tax' | 'gross'>, mode: Mode): Array<[string, number]> {
   const info = TAX_CODES[line.taxCode]
   switch (line.kind) {
-    case 'private':
+    case 'private_in':
+    case 'private_out':
       return []
     case 'asset':
       // The cost goes in through depreciation, the input tax right away.

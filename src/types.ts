@@ -12,7 +12,7 @@ export type FilingPeriod = 'month' | 'quarter' | 'none'
 
 export type TaxCode = 'DE19' | 'DE7' | 'RC_EU' | 'RC_OTHER' | 'FOREIGN_VAT' | 'ABROAD' | 'EXEMPT' | 'NONE'
 
-export type CategoryKind = 'income' | 'expense' | 'asset' | 'tax_payment' | 'tax_refund' | 'private'
+export type CategoryKind = 'income' | 'expense' | 'asset' | 'tax_payment' | 'tax_refund' | 'private_in' | 'private_out'
 
 export type EntryStatus = 'draft' | 'posted' | 'discarded'
 

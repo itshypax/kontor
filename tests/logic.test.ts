@@ -89,7 +89,7 @@ describe('EÜR', () => {
     expect(contributions(paid(11900, { kind: 'income', taxCode: 'DE19' }), 'standard')).toEqual([['income_taxable', 10000], ['vat_received', 1900]])
     expect(contributions(paid(431, { taxCode: 'RC_EU' }), 'standard')).toEqual([['edv', 431]])
     expect(contributions(paid(119000, { kind: 'asset', position: 'asset' }), 'standard')).toEqual([['input_tax_paid', 19000]])
-    expect(contributions(paid(5000, { kind: 'private', position: 'private', taxCode: 'NONE' }), 'standard')).toEqual([])
+    expect(contributions(paid(5000, { kind: 'private_out', position: 'private', taxCode: 'NONE' }), 'standard')).toEqual([])
   })
 
   test('sums a year, ignores discarded drafts and cancels reversals', () => {

@@ -51,6 +51,7 @@ CREATE TABLE accounts (
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL UNIQUE,
   reconcile INTEGER NOT NULL DEFAULT 1 CHECK (reconcile IN (0, 1)),
+  opening_balance INTEGER NOT NULL DEFAULT 0,
   active INTEGER NOT NULL DEFAULT 1 CHECK (active IN (0, 1)),
   sort INTEGER NOT NULL DEFAULT 0
 );
@@ -58,7 +59,7 @@ CREATE TABLE accounts (
 CREATE TABLE categories (
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL UNIQUE,
-  kind TEXT NOT NULL CHECK (kind IN ('income', 'expense', 'asset', 'tax_payment', 'tax_refund', 'private')),
+  kind TEXT NOT NULL CHECK (kind IN ('income', 'expense', 'asset', 'tax_payment', 'tax_refund', 'private_in', 'private_out')),
   position TEXT NOT NULL,
   default_tax_code TEXT NOT NULL,
   active INTEGER NOT NULL DEFAULT 1 CHECK (active IN (0, 1)),
@@ -92,7 +93,8 @@ BEGIN SELECT RAISE(ABORT, 'Ein Beleg bekommt höchstens einen Vermerk, sonst än
 
 CREATE TABLE periods (
   month TEXT PRIMARY KEY,
-  bank_balance INTEGER,
+  -- JSON: account id to the balance the bank showed at the end of the month
+  balances TEXT NOT NULL DEFAULT '{}',
   locked_at TEXT,
   locked_by TEXT
 );
@@ -271,7 +273,8 @@ CREATE TABLE exports (
   created_at TEXT NOT NULL,
   created_by TEXT NOT NULL,
   sha256 TEXT NOT NULL,
-  r2_key TEXT NOT NULL UNIQUE,
+  -- NULL for full backups: they are handed out, not kept, since they repeat every document.
+  r2_key TEXT UNIQUE,
   size INTEGER NOT NULL,
   filename TEXT NOT NULL
 );

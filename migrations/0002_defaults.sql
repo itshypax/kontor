@@ -62,8 +62,8 @@ INSERT INTO categories (name, kind, position, default_tax_code, sort) VALUES
   ('Anlagegut', 'asset', 'asset', 'DE19', 30),
   ('Umsatzsteuer an das Finanzamt', 'tax_payment', 'vat_paid', 'NONE', 40),
   ('Erstattung vom Finanzamt', 'tax_refund', 'vat_refund', 'NONE', 41),
-  ('Privateinlage', 'private', 'private', 'NONE', 50),
-  ('Privatentnahme', 'private', 'private', 'NONE', 51);
+  ('Privateinlage', 'private_in', 'private', 'NONE', 50),
+  ('Privatentnahme', 'private_out', 'private', 'NONE', 51);
 
 INSERT INTO procedure_docs (version, valid_from, text, created_at, created_by) VALUES (1, '2026-01-01',
 '# Verfahrensdokumentation
