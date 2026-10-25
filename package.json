@@ -1,0 +1,22 @@
+{
+  "name": "kontor",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "test": "bun test ./tests",
+    "preview": "bun scripts/preview.ts",
+    "typecheck": "tsc --noEmit",
+    "db:migrate:local": "wrangler d1 migrations apply kontor --local"
+  },
+  "dependencies": {
+    "fflate": "^0.8.3",
+    "pdf-lib": "^1.17.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261025.1",
+    "bun-types": "^1.4.4",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.152.0"
+  }
+}

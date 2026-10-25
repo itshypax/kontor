@@ -1,0 +1,32 @@
+name = "kontor"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+
+# Without this every deploy replaces the vars block and drops ACCESS_AUD,
+# which lives in the dashboard.
+keep_vars = true
+
+# The workers.dev address would bypass the Access application on the custom
+# domain. The worker checks the JWT itself, but there is no reason to expose it.
+workers_dev = false
+
+# Placeholder until `wrangler d1 create kontor` has been run for the first
+# deploy. Local development works with any id.
+[[d1_databases]]
+binding = "DB"
+database_name = "kontor"
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "FILES"
+bucket_name = "kontor-belege"
+
+[triggers]
+crons = ["17 2 * * *"]
+
+[vars]
+ACCESS_TEAM_DOMAIN = "hypax.cloudflareaccess.com"
+
+[assets]
+directory = "public"
