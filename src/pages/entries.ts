@@ -27,8 +27,9 @@ export async function entriesPage(ctx: Ctx): Promise<Response> {
   const to = isYear ? `${period}-12-31` : `${period}-31`
   // A draft list without a period is more useful: drafts of every month at once.
   const rows = await listEntries(db, status === 'draft' && !params.has('monat') ? { status } : { from, to, status, q })
-  const income = rows.reduce((s, r) => s + Math.max(0, r.total), 0)
-  const expense = rows.reduce((s, r) => s + Math.min(0, r.total), 0)
+  // By category, so a reversed expense lowers the expenses instead of counting as income.
+  const income = rows.reduce((s, r) => s + r.inflow, 0)
+  const expense = -rows.reduce((s, r) => s + r.outflow, 0)
   const year = Number(period.slice(0, 4))
   const months: string[] = []
   for (let y = year; y >= year - 1; y--) for (let m = 12; m >= 1; m--) { const v = `${y}-${String(m).padStart(2, '0')}`; if (v <= ctx.today.slice(0, 7) || v === period) months.push(v) }
@@ -46,10 +47,10 @@ export async function entriesPage(ctx: Ctx): Promise<Response> {
 <thead><tr><th>Zahlung</th><th>Buchung</th><th>Kategorie</th><th>Steuer</th><th>Beleg</th><th>Status</th><th class="r">Betrag</th></tr></thead>
 <tbody>${rows.map(r => {
     const reversed = !!r.reversedById
-    const docs = r.documents ? r.documents.split(',').map(n => `<span class="num" style="color:var(--orange-text)">${esc(n.replace(/^B-\d{4}-/, 'B-'))}</span>`).join(' ') : '<span class="badge missing">fehlt</span>'
+    const docs = r.documents ? r.documents.split(',').map(n => `<span class="num" style="color:var(--orange-text)">${esc(n.replace(/^B-\d{4}-/, 'B-'))}</span>`).join(' ') : r.hasReason ? '<span class="badge">Eigenbeleg</span>' : '<span class="badge missing">fehlt</span>'
     const taxes = (r.taxCodes ?? '').split(',').filter(isTaxCode).map(c => TAX_CODES[c as TaxCode].short).join(', ')
     return `<tr><td class="num muted">${formatDate(r.paidOn).slice(0, 6)}</td>
-<td${reversed ? ' class="strike"' : ''}><a class="cell-main" href="/buchungen/${r.id}">${esc(r.text)}</a><span class="cell-sub">${esc(r.counterparty || r.accountName)} · <span class="num">${r.number ? esc(r.number) : 'noch ohne Nummer'}</span></span></td>
+<td${reversed ? ' class="strike"' : ''}><a class="cell-main" href="/buchungen/${r.id}">${esc(r.text)}</a><span class="cell-sub">${esc(r.counterparty || r.accountName)} · ${r.number ? `<span class="num">${esc(r.number)}</span>` : 'noch ohne Nummer'}</span></td>
 <td class="muted">${esc(r.categories ?? '')}</td><td class="muted">${esc(taxes)}</td><td>${docs}</td><td>${statusBadge(r)}</td><td class="r">${amount(r.total, { strike: reversed })}</td></tr>`
   }).join('')}</tbody></table></div>` : `<p class="muted" style="padding:0 24px 24px">Keine Buchungen in diesem Zeitraum.</p>`
   const body = `${pageHead('Buchungen', '', ctx.readOnly ? '' : `<a class="btn btn-primary" href="/buchungen/neu">${icon('plus')}Neue Buchung</a>`)}
@@ -121,7 +122,7 @@ async function entryForm(ctx: Ctx, opts: { raw: EntryDraftForm; entry?: EntryVie
   const lines = raw.lines.length ? raw.lines : [{ categoryId: '', taxCode: '', gross: '' }]
   const action = opts.entry ? `/buchungen/${opts.entry.id}` : '/buchungen'
   const fiscalOptions = raw.paidOn ? [Number(raw.paidOn.slice(0, 4)) - 1, Number(raw.paidOn.slice(0, 4)) + 1] : []
-  const docList = linked.filter(Boolean).map(d => `<li><label class="check" style="flex:1;min-width:0"><input type="checkbox" name="document_id" value="${d!.id}" checked><span class="text"><strong>${esc(d!.filename)}</strong><span class="num">${esc(d!.number)} · ${esc(DOC_KINDS[d!.kind])}</span></span></label><a class="btn btn-sm" href="/belege/${d!.id}" target="_blank" rel="noopener">Ansehen</a></li>`).join('')
+  const docList = linked.filter(Boolean).map(d => `<li><label class="check" style="flex:1;min-width:0"><input type="checkbox" name="document_id" value="${d!.id}" checked><span class="text"><strong>${esc(d!.filename)}</strong><span><span class="num">${esc(d!.number)}</span> · ${esc(DOC_KINDS[d!.kind])}</span></span></label><a class="btn btn-sm" href="/belege/${d!.id}" target="_blank" rel="noopener">Ansehen</a></li>`).join('')
   const preview = linked.find(d => d && d.mime.startsWith('image/') && !d.mime.includes('hei'))
   const auditRows = opts.entry ? await entryLog(db, opts.entry.id) : ''
   return `<form method="post" action="${action}" class="row" data-entry-form>
@@ -150,7 +151,7 @@ async function entryForm(ctx: Ctx, opts: { raw: EntryDraftForm; entry?: EntryVie
       <a class="btn btn-ghost btn-lg" href="/buchungen">Abbrechen</a>
     </div>`}
   </div>
-  <aside class="side stack">
+  <aside class="side stack entry-side">
     <section class="card">
       <div class="card-head"><h2 class="label">Beleg</h2><a class="btn btn-sm" href="/belege" target="_blank" rel="noopener">${icon('upload')}Hochladen</a></div>
       ${preview ? `<img class="doc-preview" src="/belege/${preview.id}/datei" alt="" style="margin-bottom:14px">` : ''}

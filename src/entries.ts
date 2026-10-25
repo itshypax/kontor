@@ -271,6 +271,9 @@ export type EntryRow = {
   taxCodes: string
   documents: string
   total: number
+  inflow: number
+  outflow: number
+  hasReason: number
   reversesId: number | null
   reversedById: number | null
 }
@@ -295,6 +298,9 @@ export async function listEntries(db: D1Database, filter: EntryFilter = {}): Pro
       (SELECT group_concat(DISTINCT l.tax_code) FROM entry_lines l WHERE l.entry_id = e.id) AS taxCodes,
       (SELECT group_concat(d.number) FROM entry_documents ed JOIN documents d ON d.id = ed.document_id WHERE ed.entry_id = e.id) AS documents,
       COALESCE((SELECT SUM(CASE WHEN c.kind IN ('income', 'tax_refund', 'private_in') THEN l.gross ELSE -l.gross END) FROM entry_lines l JOIN categories c ON c.id = l.category_id WHERE l.entry_id = e.id), 0) AS total,
+      COALESCE((SELECT SUM(l.gross) FROM entry_lines l JOIN categories c ON c.id = l.category_id WHERE l.entry_id = e.id AND c.kind IN ('income', 'tax_refund')), 0) AS inflow,
+      COALESCE((SELECT SUM(l.gross) FROM entry_lines l JOIN categories c ON c.id = l.category_id WHERE l.entry_id = e.id AND c.kind IN ('expense', 'asset', 'tax_payment')), 0) AS outflow,
+      e.reason <> '' AS hasReason,
       e.reverses_id AS reversesId, (SELECT x.id FROM entries x WHERE x.reverses_id = e.id) AS reversedById
     FROM entries e JOIN accounts a ON a.id = e.account_id
     WHERE ${where.join(' AND ')} ORDER BY e.paid_on DESC, e.id DESC LIMIT ?`).bind(...binds, filter.limit ?? 500).all<EntryRow>()

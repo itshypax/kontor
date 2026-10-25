@@ -12,7 +12,7 @@ function lockUntil(uploadedAt: string): string {
 function docItem(d: Awaited<ReturnType<typeof listDocuments>>[number], action: string): string {
   return `<li>
   <span class="dot" aria-hidden="true" style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:12px;background:var(--surface);color:var(--muted)">${icon('doc')}</span>
-  <span class="text"><a href="/belege/${d.id}">${esc(d.filename)}</a><span class="num">${esc(d.number)} · ${esc(DOC_KINDS[d.kind])} · ${formatDate(d.uploadedAt)}${d.mistaken ? ' · Vermerk: ' + esc(d.note) : ''}</span></span>
+  <span class="text"><a href="/belege/${d.id}">${esc(d.filename)}</a><span><span class="num">${esc(d.number)}</span> · ${esc(DOC_KINDS[d.kind])} · ${formatDate(d.uploadedAt)}${d.mistaken ? ' · Vermerk: ' + esc(d.note) : ''}</span></span>
   ${action}
 </li>`
 }

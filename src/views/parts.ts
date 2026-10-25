@@ -35,9 +35,9 @@ export function segments(turnover: number, projection: number, limit: number, la
 
 /** Monthly bars, income next to expense, on one shared scale with a rounded top. */
 export function monthChart(income: number[], expense: number[], year: number): string {
-  const max = Math.max(...income, ...expense, 1)
-  const magnitude = 10 ** Math.floor(Math.log10(max / 100))
-  const top = Math.ceil(max / 100 / magnitude / 5) * 5 * magnitude * 100 || 100
+  const max = Math.max(...income, ...expense, 100)
+  const magnitude = 10 ** Math.floor(Math.log10(max))
+  const top = [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10].map(f => f * magnitude).find(v => v >= max)!
   const names = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember']
   const bars = MONTHS_SHORT.map((_, i) => {
     const tip = `${names[i]} ${year}: Einnahmen ${formatCents(income[i] ?? 0)}, Ausgaben ${formatCents(expense[i] ?? 0)}`

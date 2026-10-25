@@ -25,6 +25,7 @@ h1, h2, h3 { margin: 0; }
 .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 .muted { color: var(--muted); }
 .faint { color: var(--faint); }
+[hidden] { display: none !important; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .icon { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 
@@ -56,12 +57,13 @@ main { padding-top: 8px; padding-bottom: 72px; }
 .card.pad-lg { padding: 28px 32px; }
 .card.flush { padding: 0; overflow: hidden; }
 .card.orange { background: var(--orange); color: var(--on-orange); }
-.card.orange .label, .card.orange a { color: var(--on-orange); }
+.card.orange .label, .card.orange a:not(.btn) { color: var(--on-orange); }
 .card.alert { box-shadow: inset 0 0 0 2px var(--orange); }
 .card.dashed { background: transparent; border: 2px dashed var(--line-strong); }
 .card-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
 .card.flush .card-head { padding: 24px 24px 0; }
 .card h2 { font-size: 20px; font-weight: 700; letter-spacing: -.03em; }
+.card h2.label, .card h3.label { font-size: 13px; letter-spacing: .12em; }
 .card .sub { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
 .stack { display: flex; flex-direction: column; gap: 20px; }
 .row { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; margin-bottom: 20px; }
@@ -139,7 +141,8 @@ input[type="file"] { padding: 10px 12px; }
 .effect span { display: block; margin-top: 2px; color: #d4d4d8; font-size: 14px; }
 .line-card + .line-card { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--line); }
 
-.table-wrap { overflow-x: auto; }
+/* Positioned, so the visually hidden labels inside a scrolled table stay inside it too. */
+.table-wrap { position: relative; overflow-x: auto; }
 table.list { width: 100%; border-collapse: collapse; font-size: 14px; }
 table.list th { padding: 10px 8px; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; text-align: left; white-space: nowrap; }
 table.list td { padding: 14px 8px; border-top: 1px solid var(--line); vertical-align: top; }
@@ -230,6 +233,8 @@ pre.doc { white-space: pre-wrap; font: 14px/1.6 var(--sans); margin: 0; }
   .card.pad-lg { padding: 24px; }
   .split { grid-template-columns: 1fr; }
   .amount-input input { font-size: 44px; }
+  /* Booking from a photo: the photo comes first. */
+  .entry-side { order: -1; }
   .dock { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; position: fixed; z-index: 10; left: 16px; right: 16px; bottom: 16px; padding: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; box-shadow: 0 12px 32px rgba(0,0,0,.5); }
   .dock a { display: flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 999px; color: var(--muted); font-size: 13px; font-weight: 600; text-decoration: none; }
   .dock a[aria-current="page"] { background: var(--orange); color: var(--on-orange); font-weight: 700; }

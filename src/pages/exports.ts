@@ -36,7 +36,7 @@ ${hint(ctx.url)}
       <div class="field"><label for="from" style="color:var(--on-orange)">Von</label><input id="from" name="from" type="date" value="${year}-01-01" required></div>
       <div class="field"><label for="to" style="color:var(--on-orange)">Bis</label><input id="to" name="to" type="date" value="${year}-12-31" required></div>
     </div>
-    <fieldset style="margin:0;padding:0;border:0" class="stack">
+    <fieldset style="margin:0;padding:0;border:0;gap:4px" class="stack">
       <legend style="font-weight:700;font-size:13px;margin-bottom:6px">Enthält</legend>
       <label class="check" style="font-weight:600"><input type="checkbox" name="documents" value="1" checked style="accent-color:#111113">Belegdateien</label>
       <label class="check" style="font-weight:600"><input type="checkbox" name="log" value="1" checked style="accent-color:#111113">Änderungsprotokoll</label>

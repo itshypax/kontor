@@ -88,7 +88,7 @@ ${categoriesTable}
 
 function vatSection(ctx: Ctx, year: number, vat: VatPeriod[], selected: VatPeriod | undefined, docs: Awaited<ReturnType<typeof listDocuments>>): string {
   if (!selected) return `<section id="ustva" class="card side"><h2>Voranmeldung</h2><p class="muted">Für ${year} ist bisher keine Voranmeldung nötig.</p></section>`
-  const pills = vat.map(v => `<a href="/auswertungen?jahr=${year}&zeitraum=${v.period}#ustva"${v === selected ? ' aria-current="true"' : ''}>${esc(v.label)}${v.filing ? (v.changed ? ' · geändert' : ' · übermittelt') : ''}</a>`).join('')
+  const options = vat.map(v => `<option value="${v.period}"${v === selected ? ' selected' : ''}>${esc(v.label)}${v.filing ? (v.changed ? ', geändert' : ', übermittelt') : ', offen'}</option>`).join('')
   const r = selected.result
   const fields = r.fields.map(f => `<li style="display:flex;align-items:center;gap:14px;padding:12px 24px;border-top:1px solid var(--line)"><span class="num" style="flex:none;display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:30px;border-radius:999px;background:var(--orange-tint);color:var(--orange-text);font-size:13px">${esc(f.field)}</span><span style="flex:1;min-width:0;font-size:13px">${esc(f.label)}${f.wholeEuro ? ' <span class="muted">(volle Euro)</span>' : ''}</span><span class="num" style="flex:none">${formatCents(f.cents)}</span></li>`).join('')
   let status = ''
@@ -101,7 +101,7 @@ function vatSection(ctx: Ctx, year: number, vat: VatPeriod[], selected: VatPerio
   </form>`
   return `<section id="ustva" class="card flush side">
   <div class="card-head" style="margin-bottom:8px"><div><h2>Voranmeldung</h2><p class="sub">Kennzahlen zum Eintragen in Mein ELSTER</p></div></div>
-  <nav class="seg-links" style="margin:0 24px 8px" aria-label="Zeitraum">${pills}</nav>
+  <form method="get" action="/auswertungen#ustva" data-autosubmit style="margin:0 24px 8px" class="actions"><input type="hidden" name="jahr" value="${year}"><label class="sr" for="zeitraum">Zeitraum</label><select id="zeitraum" name="zeitraum" style="flex:1;border-radius:999px;font-weight:600">${options}</select><noscript><button class="btn btn-sm">Zeigen</button></noscript></form>
   <ul style="list-style:none;margin:8px 0 0;padding:0">${fields}
     <li style="display:flex;align-items:center;gap:14px;padding:14px 24px;border-top:1px solid var(--line-strong);background:var(--surface-2)"><span class="num" style="flex:none;display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:30px;border-radius:999px;background:var(--orange-tint);color:var(--orange-text);font-size:13px">83</span><strong style="flex:1;font-size:13px">${r.due < 0 ? 'Überschuss' : 'Verbleibende Vorauszahlung'}</strong><span class="num" style="flex:none;font-size:16px">${formatCents(r.due)}</span></li>
   </ul>
